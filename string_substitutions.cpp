@@ -43,23 +43,41 @@ int main(void) {
 
 	// START OF CHALLENGE INPUTS
 
-	// program claims no solution... and I can't see one either
+	// no solution - check
 	//std::string input1("bb*aaaaa*ba**");
 	//std::string input2("*baabb*b*aaaa");
 
-	//std::string input1("dnKeeuCCyHOnobnDYMGoXDdNWhTsaoedbPifJ*ki*wWfXjIUwqItTmGqtAItoNWpDeUnNCWgZsKWbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjui*LviGAEkyQbtR*cELfxiAbbYyJRGtcsoJZppINgJGYeZKGeWLbenBEKaoCgheYwOxLeFZJPGhTFRAjNn*");
-	//std::string input1("d*eeuCCyHOnobnDYMGoXDdNWhTsaoedbP*ijrwWfXjIUwqItTmGqtAItoNWpDeUnNCWgZs*WbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjuijkLviGAEkyQbtRUsncELfxiAbbYyJRG*soJZppINgJGYeZKGeWLbenBEKaoCghe*YwOxLeFZJPGhTFRAjNn");
+	// finds no solution - but there is one
+	std::string input1("dnKeeuCCyHOnobnDYMGoXDdNWhTsaoedbPifJ*ki*wWfXjIUwqItTmGqtAItoNWpDeUnNCWgZsKWbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjui*LviGAEkyQbtR*cELfxiAbbYyJRGtcsoJZppINgJGYeZKGeWLbenBEKaoCgheYwOxLeFZJPGhTFRAjNn*");
+	std::string input2("d*eeuCCyHOnobnDYMGoXDdNWhTsaoedbP*ijrwWfXjIUwqItTmGqtAItoNWpDeUnNCWgZs*WbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjuijkLviGAEkyQbtRUsncELfxiAbbYyJRG*soJZppINgJGYeZKGeWLbenBEKaoCghe*YwOxLeFZJPGhTFRAjNn");
 
+	// finds solution - check
 	//std::string input1("THAkZYrkUWgcTpZ*SsNQKsEnvdUveZxssEtCEQuoMqToJjMdCatMs*v*GyMlROpiIDUZyJjhwmjxFWpEwDgRLlLsJYebMSkwxEUvoDcLPLIwHY*GvoRhgcfkdsenObSjWGNYRDJAzRzavAGRoZZ*fDXIRlJkufqHDjLMJKEjLAkRRyQqTrUaWRIndSX");
-	//std::string input1("*THAkZYrkUWgcTpZSsNQKsEnvdUveZxssEtCEQuoMqToJjMdCatMsYa*nBvIFuGyMlROpiIDUZyJjh*FWpEwDgRLlLsJYebMSkw*oDcLPLIwHYbeBGvoRhgcfkdsenObSjWGNYRDJAzRzavAGRoZZvbEfDXIRlJkufqHDjLMJKEjLAkRRyQqTrU*aWRIndSX");
+	//std::string input2("*THAkZYrkUWgcTpZSsNQKsEnvdUveZxssEtCEQuoMqToJjMdCatMsYa*nBvIFuGyMlROpiIDUZyJjh*FWpEwDgRLlLsJYebMSkw*oDcLPLIwHYbeBGvoRhgcfkdsenObSjWGNYRDJAzRzavAGRoZZvbEfDXIRlJkufqHDjLMJKEjLAkRRyQqTrU*aWRIndSX");
 
+	// finds solution - check
 	//std::string input1("jEAmXdDUtthXNLbIZFeWdiQPGEvyCEeLI**EyficABUH*YiSZRREvniDexKJSjLXMYfsw*YlbTSZBlYSecorJsWidfALQYzOdrKNrJZRdrQEDoyhPMYAfTiHZIuqGtEkKqYBzxtCOJhRYfZNSYNxRWFrfahlSLvdBTebrXDgGlZEqxRIvGhN*mfhLLSExNHaHLAZI");
-	//std::string input1("jEAmXdDUtthXNLbIZFeWdiQPGEvyCEeL**BUHYiSZRREvniDexKJSjLXMYfswlaYlbTSZBlYSecorJsWidfALQYzOdrKNrJZ*EDoyhPMYAfTiHZIuqGtEkKqYBzxtC*YfZNSYNxRWFrfahlSLvdBT*ebrXDgGlZEqxRIvGhNcmfhLLSExNHaHLAZI");
+	//std::string input2("jEAmXdDUtthXNLbIZFeWdiQPGEvyCEeL**BUHYiSZRREvniDexKJSjLXMYfswlaYlbTSZBlYSecorJsWidfALQYzOdrKNrJZ*EDoyhPMYAfTiHZIuqGtEkKqYBzxtC*YfZNSYNxRWFrfahlSLvdBT*ebrXDgGlZEqxRIvGhNcmfhLLSExNHaHLAZI");
 
-   std::vector<Solution> solution_stack; 
-   // TODO: use queue instead for depth-first?
-   //       no, actually stack is depth-first
-   
+	// "a*b" 
+	// "*"
+	
+	// a*b
+	// c*b
+
+	// a*b
+	// a*c
+
+	// *
+	// abcd
+
+	// *ab
+	// cd*
+
+	// abcdefgh
+	// **
+
+   std::vector<Solution> solution_stack;   
    
    solution_stack.push_back(Solution(Split(input1), Split(input2)));
    
@@ -100,17 +118,6 @@ int main(void) {
 
          solution_stack.push_back(s1);
          solution_stack.push_back(s2);
-         /*int i = 0;
-         int j = 0;
-         int count1 = 0;
-         int count2 = 0;
-         // TODO: O(n^2) if lots of *s?
-
-         while (((count1 <= 4) && (possible_solution.split1.not_done.length() >= i))
-            && ((count2 <= 4) && (possible_solution.split2.not_done.length() >= i))) // TODO: this only works if nested loops? 
-         {
-            Solution s(possible_solution);
-         }*/
       }
       else if (c1 == '*') {
          // * from s1 can match up to 4 chars from s2
@@ -128,8 +135,24 @@ int main(void) {
             // TODO: this is copy/pasted
             // TODO: edge case: one length is 0, other not_done is all ***
             //       need a .done() function, checks for not_done length == 0 or all ***
-            bool done1 = (s.split1.not_done.length() == 0);
-            bool done2 = (s.split2.not_done.length() == 0);
+            
+			bool s1empty = (s.split1.not_done.length() == 0);
+            bool s2empty = (s.split2.not_done.length() == 0);
+
+			bool done1 = true;
+			bool done2 = true;
+			for (const char& c : s.split1.not_done) {
+				if (c != '*') {
+					done1 = false;
+					break;
+				}
+			}
+			for (const char& c : s.split2.not_done) {
+				if (c != '*') {
+					done2 = false;
+					break;
+				}
+			}
 
             if (done1 && done2) {
                // found a solution
@@ -138,14 +161,14 @@ int main(void) {
                std::cout << s.split2.done << std::endl;
                return 0;
             }
-            else if (!done1 && !done2) {
+			else if (s1empty != s2empty) {
+				// one is out of chars, other has chars left (that are not *'s)
+				// this solution is no good, so discard it
+			}
+
+            else {
                // could still be a solution, keep going with it
                solution_stack.push_back(s);
-            }
-            else {
-               // one is done and the other is not - this solution is no good, so discard it
-               // no action required - just don't put it back on the stack
-               //continue; // TODO: not necessary?
             }
 
 			int star_count = 0;
@@ -237,13 +260,11 @@ int main(void) {
             else {
                // one is done and the other is not - this solution is no good, so discard it
                // no action required - just don't put it back on the stack
-               //continue; // TODO: not necessary?
             }
             
          }
          else {
             // this branch didn't work, so move on
-            //continue; // TODO: not necessary?
          }
       }
       
