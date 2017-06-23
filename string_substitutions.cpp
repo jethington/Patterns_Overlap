@@ -33,8 +33,28 @@ struct Solution {
 void printPartial(const Solution& s);
 
 int main(void) {
-   std::string input1("Shakes*e");
-   std::string input2("S*speare");
+	// sample input 1: solution "Shakespeare"
+	//std::string input1("Shakes*e");
+   //std::string input2("S*speare");
+
+	// sample input 2: no solution
+	//std::string input1("a*baa**ba**aa");
+	//std::string input2("*ca*b**a*baac");
+
+	// START OF CHALLENGE INPUTS
+
+	// program claims no solution... and I can't see one either
+	//std::string input1("bb*aaaaa*ba**");
+	//std::string input2("*baabb*b*aaaa");
+
+	//std::string input1("dnKeeuCCyHOnobnDYMGoXDdNWhTsaoedbPifJ*ki*wWfXjIUwqItTmGqtAItoNWpDeUnNCWgZsKWbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjui*LviGAEkyQbtR*cELfxiAbbYyJRGtcsoJZppINgJGYeZKGeWLbenBEKaoCgheYwOxLeFZJPGhTFRAjNn*");
+	//std::string input1("d*eeuCCyHOnobnDYMGoXDdNWhTsaoedbP*ijrwWfXjIUwqItTmGqtAItoNWpDeUnNCWgZs*WbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjuijkLviGAEkyQbtRUsncELfxiAbbYyJRG*soJZppINgJGYeZKGeWLbenBEKaoCghe*YwOxLeFZJPGhTFRAjNn");
+
+	//std::string input1("THAkZYrkUWgcTpZ*SsNQKsEnvdUveZxssEtCEQuoMqToJjMdCatMs*v*GyMlROpiIDUZyJjhwmjxFWpEwDgRLlLsJYebMSkwxEUvoDcLPLIwHY*GvoRhgcfkdsenObSjWGNYRDJAzRzavAGRoZZ*fDXIRlJkufqHDjLMJKEjLAkRRyQqTrUaWRIndSX");
+	//std::string input1("*THAkZYrkUWgcTpZSsNQKsEnvdUveZxssEtCEQuoMqToJjMdCatMsYa*nBvIFuGyMlROpiIDUZyJjh*FWpEwDgRLlLsJYebMSkw*oDcLPLIwHYbeBGvoRhgcfkdsenObSjWGNYRDJAzRzavAGRoZZvbEfDXIRlJkufqHDjLMJKEjLAkRRyQqTrU*aWRIndSX");
+
+	//std::string input1("jEAmXdDUtthXNLbIZFeWdiQPGEvyCEeLI**EyficABUH*YiSZRREvniDexKJSjLXMYfsw*YlbTSZBlYSecorJsWidfALQYzOdrKNrJZRdrQEDoyhPMYAfTiHZIuqGtEkKqYBzxtCOJhRYfZNSYNxRWFrfahlSLvdBTebrXDgGlZEqxRIvGhN*mfhLLSExNHaHLAZI");
+	//std::string input1("jEAmXdDUtthXNLbIZFeWdiQPGEvyCEeL**BUHYiSZRREvniDexKJSjLXMYfswlaYlbTSZBlYSecorJsWidfALQYzOdrKNrJZ*EDoyhPMYAfTiHZIuqGtEkKqYBzxtC*YfZNSYNxRWFrfahlSLvdBT*ebrXDgGlZEqxRIvGhNcmfhLLSExNHaHLAZI");
 
    std::vector<Solution> solution_stack; 
    // TODO: use queue instead for depth-first?
@@ -43,36 +63,71 @@ int main(void) {
    
    solution_stack.push_back(Solution(Split(input1), Split(input2)));
    
-   bool done = false;
-   
-   while (done == false) {
+   while (true) {
       
+	   if (solution_stack.size() == 0) {
+		   break;
+	   }
+
       // TODO: there must be a better way to get the popped item?  use std::move maybe?
       Solution possible_solution = solution_stack[solution_stack.size() - 1];
       solution_stack.pop_back(); 
       
-      printPartial(possible_solution);
+      //printPartial(possible_solution);
 
       char c1 = possible_solution.split1.not_done[0];
       char c2 = possible_solution.split2.not_done[0];
       
       if ((c1 == '*') && (c2 == '*')) {
+         // TODO: what happens if I remove a * from one, push solution, remove a * from the other, push solution?
+         //       appears to work, but what if double *'s? think it's still ok?
          
+         if ((possible_solution.split1.not_done.length() == 1) && (possible_solution.split2.not_done.length() == 1)) {
+            // *'s were at the end, found a solution
+            std::cout << "Solution found: " << std::endl;
+            std::cout << possible_solution.split1.done << std::endl;
+            std::cout << possible_solution.split2.done << std::endl;
+            return 0;
+         }
+
+         Solution s1(possible_solution);
+         Solution s2(possible_solution);
+
+         s1.split1.not_done.erase(0, 1); // remove a * from one of these and keep going - this pushes it into two of the three cases below
+         s2.split2.not_done.erase(0, 1);
+
+         // TODO: edge case, what if this was the last character in one or both of them?
+
+         solution_stack.push_back(s1);
+         solution_stack.push_back(s2);
+         /*int i = 0;
+         int j = 0;
+         int count1 = 0;
+         int count2 = 0;
+         // TODO: O(n^2) if lots of *s?
+
+         while (((count1 <= 4) && (possible_solution.split1.not_done.length() >= i))
+            && ((count2 <= 4) && (possible_solution.split2.not_done.length() >= i))) // TODO: this only works if nested loops? 
+         {
+            Solution s(possible_solution);
+         }*/
       }
       else if (c1 == '*') {
          // * from s1 can match up to 4 chars from s2
-         int count = 0;
          int i = 0; // index does not necessarily == count because *'s could add 0 length
                     // for example, * match ab**ab is possible
-         while ((count <= 4) && (possible_solution.split2.not_done.length() >= i)) {
+         while (possible_solution.split2.not_done.length() >= i) {
             // TODO: repeating this work in a loop is inefficient
             Solution s(possible_solution);
+			std::string match = s.split2.not_done.substr(0, i);
             s.split1.not_done.erase(0, 1);
-            s.split1.done.append(s.split2.not_done.substr(0, i));
-            s.split2.done.append(s.split2.not_done.substr(0, i)); // first iteration will be 0 - that is intended because * could match nothing at all
+            s.split1.done.append(match);
+            s.split2.done.append(match); // first iteration will be 0 - that is intended because * could match nothing at all
             s.split2.not_done.erase(0, i);
 
             // TODO: this is copy/pasted
+            // TODO: edge case: one length is 0, other not_done is all ***
+            //       need a .done() function, checks for not_done length == 0 or all ***
             bool done1 = (s.split1.not_done.length() == 0);
             bool done2 = (s.split2.not_done.length() == 0);
 
@@ -93,25 +148,35 @@ int main(void) {
                //continue; // TODO: not necessary?
             }
 
-            if (s.split2.done[s.split2.done.length() - 1] != '*') {
-               count++; // only increase count if matched char is not a * - because * can be empty string
-            }
+			int star_count = 0;
+			for (const char& c : match) {
+				if (c == '*') {
+					star_count++;
+				}
+			}
+			int matched_chars = match.length() - star_count;
+			if (matched_chars >= 4) {
+				break;
+			}
+
             i++; // always increase i - to move onto the next char
          }
       }
       else if (c2 == '*') {
          // * from s2 can match up to 4 chars from s1
-         int count = 0;
          int i = 0; // index does not necessarily == count because *'s could add 0 length
          // for example, * match ab**ab is possible
-         while ((count <= 4) && (possible_solution.split1.not_done.length() >= i)) {
-            // TODO: repeating this work in a loop is inefficient
+
+         while (possible_solution.split1.not_done.length() >= i) {
+			 
+			 // TODO: repeating this work in a loop is inefficient
             Solution s(possible_solution);
             s.split2.not_done.erase(0, 1);
-            s.split2.done.append(s.split1.not_done.substr(0, i));
-            s.split1.done.append(s.split1.not_done.substr(0, i)); // first iteration will be 0 - that is intended because * could match nothing at all
+			std::string match = s.split1.not_done.substr(0, i); // first iteration will be 0 - that is intended because * could match nothing at all
+            s.split2.done.append(match);
+            s.split1.done.append(match); 
             s.split1.not_done.erase(0, i);
-
+			
             // TODO: this is copy/pasted
             bool done1 = (s.split1.not_done.length() == 0);
             bool done2 = (s.split2.not_done.length() == 0);
@@ -132,10 +197,18 @@ int main(void) {
                // no action required - just don't put it back on the stack
                //continue; // TODO: not necessary?
             }
+			
+			int star_count = 0;
+			for (const char& c : match) {
+				if (c == '*') {
+					star_count++;
+				}
+			}
+			int matched_chars = match.length() - star_count;
+			if (matched_chars >= 4) {
+				break;
+			}
 
-            if (s.split1.done[s.split1.done.length() - 1] != '*') {
-               count++; // only increase count if matched char is not a * - because * can be empty string
-            }
             i++; // always increase i - to move onto the next char
          }
       }
