@@ -3,85 +3,49 @@
 #include <algorithm>
 #include <string>
 #include <iostream>
+#include <tuple>
+#include <cassert>
 
 struct Split {
-   // TODO: can optimize this if needed
-   //       instead of not_done, original + index/pointer?
-   std::string done;
-   std::string not_done;
-   
-   Split(std::string start): not_done(start) {
+    // TODO: can optimize this if needed
+    //       instead of not_done, original + index/pointer?
+    std::string done;
+    std::string not_done;
+
+    Split(std::string start): not_done(start) {
       
-   }
+    }
 };
 
 struct Solution {
-   Split split1;
-   Split split2;
-   // TODO: shared std::string done (should match for both anyways)
-   //       Split should instead store original string + index to track completed (and rename it)
-   
-   Solution(Split one, Split two): split1(one), split2(two) {      
-   
-   }
+    Split split1;
+    Split split2;
+    // TODO: shared std::string done (should match for both anyways)
+    //       Split should instead store original string + index to track completed (and rename it)
 
-   Solution(const Solution& other) : split1(other.split1), split2(other.split2) {
+    Solution(): split1(std::string("")), split2(std::string("")) { // TODO: default constructor not needed if using boost::Optional?
+        //split1 = Split(std::string("")); // should never be used...
+    }
 
-   }
+    Solution(Split one, Split two): split1(one), split2(two) {      
+
+    }
+
+    Solution(const Solution& other) : split1(other.split1), split2(other.split2) {
+
+    }
 };
 
-void printPartial(const Solution& s);
+//void printPartial(const Solution& s);
+std::tuple<bool, Solution> solve(std::string input1, std::string input2);
+void run_tests(void);
 
-int main(void) {
-	// sample input 1: solution "Shakespeare"
-	//std::string input1("Shakes*e");
-   //std::string input2("S*speare");
-
-	// sample input 2: no solution
-	//std::string input1("a*baa**ba**aa");
-	//std::string input2("*ca*b**a*baac");
-
-	// START OF CHALLENGE INPUTS
-
-	// no solution - check
-	//std::string input1("bb*aaaaa*ba**");
-	//std::string input2("*baabb*b*aaaa");
-
-	// finds no solution - but there is one
-	std::string input1("dnKeeuCCyHOnobnDYMGoXDdNWhTsaoedbPifJ*ki*wWfXjIUwqItTmGqtAItoNWpDeUnNCWgZsKWbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjui*LviGAEkyQbtR*cELfxiAbbYyJRGtcsoJZppINgJGYeZKGeWLbenBEKaoCgheYwOxLeFZJPGhTFRAjNn*");
-	std::string input2("d*eeuCCyHOnobnDYMGoXDdNWhTsaoedbP*ijrwWfXjIUwqItTmGqtAItoNWpDeUnNCWgZs*WbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjuijkLviGAEkyQbtRUsncELfxiAbbYyJRG*soJZppINgJGYeZKGeWLbenBEKaoCghe*YwOxLeFZJPGhTFRAjNn");
-
-	// finds solution - check
-	//std::string input1("THAkZYrkUWgcTpZ*SsNQKsEnvdUveZxssEtCEQuoMqToJjMdCatMs*v*GyMlROpiIDUZyJjhwmjxFWpEwDgRLlLsJYebMSkwxEUvoDcLPLIwHY*GvoRhgcfkdsenObSjWGNYRDJAzRzavAGRoZZ*fDXIRlJkufqHDjLMJKEjLAkRRyQqTrUaWRIndSX");
-	//std::string input2("*THAkZYrkUWgcTpZSsNQKsEnvdUveZxssEtCEQuoMqToJjMdCatMsYa*nBvIFuGyMlROpiIDUZyJjh*FWpEwDgRLlLsJYebMSkw*oDcLPLIwHYbeBGvoRhgcfkdsenObSjWGNYRDJAzRzavAGRoZZvbEfDXIRlJkufqHDjLMJKEjLAkRRyQqTrU*aWRIndSX");
-
-	// finds solution - check
-	//std::string input1("jEAmXdDUtthXNLbIZFeWdiQPGEvyCEeLI**EyficABUH*YiSZRREvniDexKJSjLXMYfsw*YlbTSZBlYSecorJsWidfALQYzOdrKNrJZRdrQEDoyhPMYAfTiHZIuqGtEkKqYBzxtCOJhRYfZNSYNxRWFrfahlSLvdBTebrXDgGlZEqxRIvGhN*mfhLLSExNHaHLAZI");
-	//std::string input2("jEAmXdDUtthXNLbIZFeWdiQPGEvyCEeL**BUHYiSZRREvniDexKJSjLXMYfswlaYlbTSZBlYSecorJsWidfALQYzOdrKNrJZ*EDoyhPMYAfTiHZIuqGtEkKqYBzxtC*YfZNSYNxRWFrfahlSLvdBT*ebrXDgGlZEqxRIvGhNcmfhLLSExNHaHLAZI");
-
-	// "a*b" 
-	// "*"
-	
-	// a*b
-	// c*b
-
-	// a*b
-	// a*c
-
-	// *
-	// abcd
-
-	// *ab
-	// cd*
-
-	// abcdefgh
-	// **
-
-   std::vector<Solution> solution_stack;   
+std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
+    std::vector<Solution> solution_stack;   
    
-   solution_stack.push_back(Solution(Split(input1), Split(input2)));
+    solution_stack.push_back(Solution(Split(input1), Split(input2)));
    
-   while (true) {
+    while (true) {
       
 	   if (solution_stack.size() == 0) {
 		   break;
@@ -102,10 +66,7 @@ int main(void) {
          
          if ((possible_solution.split1.not_done.length() == 1) && (possible_solution.split2.not_done.length() == 1)) {
             // *'s were at the end, found a solution
-            std::cout << "Solution found: " << std::endl;
-            std::cout << possible_solution.split1.done << std::endl;
-            std::cout << possible_solution.split2.done << std::endl;
-            return 0;
+            return std::make_tuple(true, possible_solution);
          }
 
          Solution s1(possible_solution);
@@ -156,10 +117,7 @@ int main(void) {
 
             if (done1 && done2) {
                // found a solution
-               std::cout << "Solution found: " << std::endl;
-               std::cout << s.split1.done << std::endl;
-               std::cout << s.split2.done << std::endl;
-               return 0;
+               return std::make_tuple(true, s);
             }
 			else if (s1empty != s2empty) {
 				// one is out of chars, other has chars left (that are not *'s)
@@ -206,10 +164,7 @@ int main(void) {
 
             if (done1 && done2) {
                // found a solution
-               std::cout << "Solution found: " << std::endl;
-               std::cout << s.split1.done << std::endl;
-               std::cout << s.split2.done << std::endl;
-               return 0;
+               return std::make_tuple(true, s);
             }
             else if (!done1 && !done2) {
                // could still be a solution, keep going with it
@@ -248,10 +203,7 @@ int main(void) {
             bool done2 = (possible_solution.split2.not_done.length() == 0);
             if (done1 && done2) {
                // found a solution
-               std::cout << "Solution found: " << std::endl;
-               std::cout << possible_solution.split1.done << std::endl;
-               std::cout << possible_solution.split2.done << std::endl;
-               return 0;
+               return std::make_tuple(true, possible_solution);
             }
             else if (!done1 && !done2) {
                // could still be a solution, keep going with it
@@ -265,18 +217,103 @@ int main(void) {
          }
          else {
             // this branch didn't work, so move on
+            // no action required - just don't put it back on the stack
          }
       }
       
    }
 
    // if this is reached, all possible solutions were exhausted
-   std::cout << "No solution found" << std::endl;
-   return 0;
+   return std::make_tuple(false, Solution());
 }
 
-void printPartial(const Solution& s) {
-   std::cout << s.split1.done << ", " << s.split1.not_done << std::endl;
-   std::cout << s.split2.done << ", " << s.split2.not_done << std::endl;
-   std::cout << std::endl;
+int main(void) {
+	run_tests();
+
+	// finds no solution - but there is one
+	std::string input1("dnKeeuCCyHOnobnDYMGoXDdNWhTsaoedbPifJ*ki*wWfXjIUwqItTmGqtAItoNWpDeUnNCWgZsKWbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjui*LviGAEkyQbtR*cELfxiAbbYyJRGtcsoJZppINgJGYeZKGeWLbenBEKaoCgheYwOxLeFZJPGhTFRAjNn*");
+	std::string input2("d*eeuCCyHOnobnDYMGoXDdNWhTsaoedbP*ijrwWfXjIUwqItTmGqtAItoNWpDeUnNCWgZs*WbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjuijkLviGAEkyQbtRUsncELfxiAbbYyJRG*soJZppINgJGYeZKGeWLbenBEKaoCghe*YwOxLeFZJPGhTFRAjNn");
+
+	// finds solution - check
+	//std::string input1("THAkZYrkUWgcTpZ*SsNQKsEnvdUveZxssEtCEQuoMqToJjMdCatMs*v*GyMlROpiIDUZyJjhwmjxFWpEwDgRLlLsJYebMSkwxEUvoDcLPLIwHY*GvoRhgcfkdsenObSjWGNYRDJAzRzavAGRoZZ*fDXIRlJkufqHDjLMJKEjLAkRRyQqTrUaWRIndSX");
+	//std::string input2("*THAkZYrkUWgcTpZSsNQKsEnvdUveZxssEtCEQuoMqToJjMdCatMsYa*nBvIFuGyMlROpiIDUZyJjh*FWpEwDgRLlLsJYebMSkw*oDcLPLIwHYbeBGvoRhgcfkdsenObSjWGNYRDJAzRzavAGRoZZvbEfDXIRlJkufqHDjLMJKEjLAkRRyQqTrU*aWRIndSX");
+
+	// finds solution - check
+	//std::string input1("jEAmXdDUtthXNLbIZFeWdiQPGEvyCEeLI**EyficABUH*YiSZRREvniDexKJSjLXMYfsw*YlbTSZBlYSecorJsWidfALQYzOdrKNrJZRdrQEDoyhPMYAfTiHZIuqGtEkKqYBzxtCOJhRYfZNSYNxRWFrfahlSLvdBTebrXDgGlZEqxRIvGhN*mfhLLSExNHaHLAZI");
+	//std::string input2("jEAmXdDUtthXNLbIZFeWdiQPGEvyCEeL**BUHYiSZRREvniDexKJSjLXMYfswlaYlbTSZBlYSecorJsWidfALQYzOdrKNrJZ*EDoyhPMYAfTiHZIuqGtEkKqYBzxtC*YfZNSYNxRWFrfahlSLvdBT*ebrXDgGlZEqxRIvGhNcmfhLLSExNHaHLAZI");
+
+    auto result = solve(input1, input2);
+    bool solution_found;
+    Solution s;
+    std::tie(solution_found, s) = result;
+
+    if (solution_found) {
+        std::cout << "Solution found: " << std::endl;
+        std::cout << s.split1.done << std::endl;
+        std::cout << s.split2.done << std::endl;
+    }
+    else {
+        std::cout << "No solution found" << std::endl;
+    }
+    return 0;
 }
+
+void run_tests(void) {
+    std::tuple<bool, Solution> result;
+    bool solution_found;
+    Solution s;    
+
+    //sample input 1: solution "Shakespeare"
+	std::string s1("Shakes*e");
+    std::string s2("S*speare");
+    result = solve(s1, s2);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == true);
+    assert(s.split1.done == "Shakespeare");
+
+    // sample input 2: no solution
+	std::string s3("a*baa**ba**aa");
+	std::string s4("*ca*b**a*baac");
+    result = solve(s3, s4);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == false);
+
+	// START OF CHALLENGE INPUTS
+
+	// no solution - check
+    std::string s5("bb*aaaaa*ba**");
+	std::string s6("*baabb*b*aaaa");
+    result = solve(s5, s6);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == false);
+
+    // "a*b" 
+	// "*"
+	
+	// a*b
+	// c*b
+
+	// a*b
+	// a*c
+
+	// *
+	// abcd
+
+	// *ab
+	// cd*
+
+	// abcdefgh
+	// **
+
+    // abc**
+    // abc*
+
+    // ab*cd**
+    // *def
+}
+
+//void printPartial(const Solution& s) {
+//    std::cout << s.split1.done << ", " << s.split1.not_done << std::endl;
+//    std::cout << s.split2.done << ", " << s.split2.not_done << std::endl;
+//    std::cout << std::endl;
+//}
