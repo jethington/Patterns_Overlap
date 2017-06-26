@@ -39,6 +39,7 @@ struct Solution {
 //void printPartial(const Solution& s);
 std::tuple<bool, Solution> solve(std::string input1, std::string input2);
 void run_tests(void);
+Solution remove_stars(Solution s);
 
 std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
     std::vector<Solution> solution_stack;   
@@ -66,6 +67,7 @@ std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
          
          if ((possible_solution.split1.not_done.length() == 1) && (possible_solution.split2.not_done.length() == 1)) {
             // *'s were at the end, found a solution
+            possible_solution = remove_stars(possible_solution);
             return std::make_tuple(true, possible_solution);
          }
 
@@ -116,8 +118,9 @@ std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
 			}
 
             if (done1 && done2) {
-               // found a solution
-               return std::make_tuple(true, s);
+                // found a solution
+                s = remove_stars(s);
+                return std::make_tuple(true, s);
             }
 			else if (s1empty != s2empty) {
 				// one is out of chars, other has chars left (that are not *'s)
@@ -163,8 +166,9 @@ std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
             bool done2 = (s.split2.not_done.length() == 0);
 
             if (done1 && done2) {
-               // found a solution
-               return std::make_tuple(true, s);
+                // found a solution
+                s = remove_stars(s);
+                return std::make_tuple(true, s);
             }
             else if (!done1 && !done2) {
                // could still be a solution, keep going with it
@@ -202,8 +206,9 @@ std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
             bool done1 = (possible_solution.split1.not_done.length() == 0);
             bool done2 = (possible_solution.split2.not_done.length() == 0);
             if (done1 && done2) {
-               // found a solution
-               return std::make_tuple(true, possible_solution);
+                // found a solution
+                possible_solution = remove_stars(possible_solution);
+                return std::make_tuple(true, possible_solution);
             }
             else if (!done1 && !done2) {
                // could still be a solution, keep going with it
@@ -225,6 +230,22 @@ std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
 
    // if this is reached, all possible solutions were exhausted
    return std::make_tuple(false, Solution());
+}
+
+Solution remove_stars(Solution s) {
+    // used to clean up a solution before printing 
+    // for example, with the current code: when a*b matches *, the 'done' string == a*b, not ab
+    std::string filtered;
+    for (const char& c: s.split1.done) {
+        if (c != '*') {
+            filtered.push_back(c);
+        }
+    }
+
+    s.split1.done = filtered;
+    s.split2.done = filtered;
+
+    return s;
 }
 
 int main(void) {
@@ -287,29 +308,61 @@ void run_tests(void) {
     std::tie(solution_found, s) = result;
     assert(solution_found == false);
 
-    // "a*b" 
-	// "*"
-	
-	// a*b
-	// c*b
+    // my own tests
 
-	// a*b
-	// a*c
+    std::string s7("a*b");
+    std::string s8("*");
+    result = solve(s7, s8);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == true);
+    assert(s.split1.done == "ab");
 
-	// *
-	// abcd
+    std::string  s9("a*b");
+	std::string s10("c*b");
+    result = solve(s9, s10);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == false);
 
-	// *ab
-	// cd*
+    std::string s11("a*b");
+	std::string s12("a*c");
+    result = solve(s11, s12);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == false);
 
-	// abcdefgh
-	// **
+    std::string s13("*");
+    std::string s14("abcd");
+    result = solve(s13, s14);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == true);
+    assert(s.split1.done == "abcd");
 
-    // abc**
-    // abc*
+    std::string s15("*ab");
+    std::string s16("cd*");
+    result = solve(s15, s16);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == true);
+    assert(s.split1.done == "cdab");
 
-    // ab*cd**
-    // *def
+    std::string s17("abcdefgh");
+    std::string s18("**");
+    result = solve(s17, s18);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == true);
+    assert(s.split1.done == "abcdefgh");
+
+    std::string s19("abc**");
+    std::string s20("abc*");
+    result = solve(s19, s20);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == true);
+    assert(s.split1.done == "abc");
+
+    std::string s21("ab*cd**");
+    std::string s22("*def");
+    result = solve(s21, s22);
+    std::tie(solution_found, s) = result;
+    assert(solution_found == true);
+    assert(s.split1.done == "abcddef"); // note: finds this before "abcdef" - is that expected or due to a bug?
 }
 
 //void printPartial(const Solution& s) {
