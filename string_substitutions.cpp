@@ -15,6 +15,21 @@ struct Split {
     Split(std::string start): not_done(start) {
       
     }
+
+	bool is_empty(void) {
+		return (not_done.length() == 0);
+	}
+
+	bool is_done(void) {
+		bool result = true;
+		for (const char& c : not_done) {
+			if (c != '*') {
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
 };
 
 struct Solution {
@@ -98,35 +113,16 @@ std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
             // TODO: this is copy/pasted
             // TODO: edge case: one length is 0, other not_done is all ***
             //       need a .done() function, checks for not_done length == 0 or all ***
-            
-			bool s1empty = (s.split1.not_done.length() == 0);
-            bool s2empty = (s.split2.not_done.length() == 0);
 
-			bool done1 = true;
-			bool done2 = true;
-			for (const char& c : s.split1.not_done) {
-				if (c != '*') {
-					done1 = false;
-					break;
-				}
-			}
-			for (const char& c : s.split2.not_done) {
-				if (c != '*') {
-					done2 = false;
-					break;
-				}
-			}
-
-            if (done1 && done2) {
+            if (s.split1.is_done() && s.split2.is_done()) {
                 // found a solution
                 s = remove_stars(s);
                 return std::make_tuple(true, s);
             }
-			else if (s1empty != s2empty) {
+			else if (s.split1.is_empty() != s.split2.is_empty()) {
 				// one is out of chars, other has chars left (that are not *'s)
 				// this solution is no good, so discard it
 			}
-
             else {
                // could still be a solution, keep going with it
                solution_stack.push_back(s);
@@ -161,24 +157,19 @@ std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
             s.split1.done.append(match); 
             s.split1.not_done.erase(0, i);
 			
-            // TODO: this is copy/pasted
-            bool done1 = (s.split1.not_done.length() == 0);
-            bool done2 = (s.split2.not_done.length() == 0);
-
-            if (done1 && done2) {
-                // found a solution
-                s = remove_stars(s);
-                return std::make_tuple(true, s);
-            }
-            else if (!done1 && !done2) {
-               // could still be a solution, keep going with it
-               solution_stack.push_back(s);
-            }
-            else {
-               // one is done and the other is not - this solution is no good, so discard it
-               // no action required - just don't put it back on the stack
-               //continue; // TODO: not necessary?
-            }
+			if (s.split1.is_done() && s.split2.is_done()) {
+				// found a solution
+				s = remove_stars(s);
+				return std::make_tuple(true, s);
+			}
+			else if (s.split1.is_empty() != s.split2.is_empty()) {
+				// one is out of chars, other has chars left (that are not *'s)
+				// this solution is no good, so discard it
+			}
+			else {
+				// could still be a solution, keep going with it
+				solution_stack.push_back(s);
+			}
 			
 			int star_count = 0;
 			for (const char& c : match) {
@@ -203,22 +194,19 @@ std::tuple<bool, Solution> solve(std::string input1, std::string input2) {
             possible_solution.split1.not_done.erase(0, 1);
             possible_solution.split2.not_done.erase(0, 1);
 
-            bool done1 = (possible_solution.split1.not_done.length() == 0);
-            bool done2 = (possible_solution.split2.not_done.length() == 0);
-            if (done1 && done2) {
-                // found a solution
-                possible_solution = remove_stars(possible_solution);
-                return std::make_tuple(true, possible_solution);
-            }
-            else if (!done1 && !done2) {
-               // could still be a solution, keep going with it
-               solution_stack.push_back(possible_solution);
-            }
-            else {
-               // one is done and the other is not - this solution is no good, so discard it
-               // no action required - just don't put it back on the stack
-            }
-            
+			if (possible_solution.split1.is_done() && possible_solution.split2.is_done()) {
+				// found a solution
+				possible_solution = remove_stars(possible_solution);
+				return std::make_tuple(true, possible_solution);
+			}
+			else if (possible_solution.split1.is_empty() != possible_solution.split2.is_empty()) {
+				// one is out of chars, other has chars left (that are not *'s)
+				// this solution is no good, so discard it
+			}
+			else {
+				// could still be a solution, keep going with it
+				solution_stack.push_back(possible_solution);
+			}
          }
          else {
             // this branch didn't work, so move on
@@ -251,7 +239,7 @@ Solution remove_stars(Solution s) {
 int main(void) {
 	run_tests();
 
-	// finds no solution - but there is one
+	// finds solution - check
 	std::string input1("dnKeeuCCyHOnobnDYMGoXDdNWhTsaoedbPifJ*ki*wWfXjIUwqItTmGqtAItoNWpDeUnNCWgZsKWbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjui*LviGAEkyQbtR*cELfxiAbbYyJRGtcsoJZppINgJGYeZKGeWLbenBEKaoCgheYwOxLeFZJPGhTFRAjNn*");
 	std::string input2("d*eeuCCyHOnobnDYMGoXDdNWhTsaoedbP*ijrwWfXjIUwqItTmGqtAItoNWpDeUnNCWgZs*WbuQxKaqemXuFXDylQubuZWhMyDsXvDSwYjuijkLviGAEkyQbtRUsncELfxiAbbYyJRG*soJZppINgJGYeZKGeWLbenBEKaoCghe*YwOxLeFZJPGhTFRAjNn");
 
@@ -363,10 +351,10 @@ void run_tests(void) {
     std::tie(solution_found, s) = result;
     assert(solution_found == true);
     assert(s.split1.done == "abcddef"); // note: finds this before "abcdef" - is that expected or due to a bug?
-}
 
-//void printPartial(const Solution& s) {
-//    std::cout << s.split1.done << ", " << s.split1.not_done << std::endl;
-//    std::cout << s.split2.done << ", " << s.split2.not_done << std::endl;
-//    std::cout << std::endl;
-//}
+	std::string s23("a*");
+	std::string s24("a");
+	result = solve(s23, s24);
+	std::tie(solution_found, s) = result;
+	assert(solution_found == true);
+}
